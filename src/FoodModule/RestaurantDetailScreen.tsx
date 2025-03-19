@@ -586,7 +586,7 @@ const RestaurantDetailScreen: React.FC = () => {
                           alignItems: 'center',
                           marginTop: 4,
                         }}>
-                        <Ionicons name="location" size={14} color="#ff3b30" />
+                        <Ionicons name="location-outline" size={14} color="#ED264E" />
                         <Text
                           style={{marginLeft: 4, color: 'gray', fontSize: 13}}>
                           190m
@@ -617,7 +617,7 @@ const RestaurantDetailScreen: React.FC = () => {
                   </View>
                   <Text style={styles.recommendedDesc} numberOfLines={2}>
                     Lorem ipsum dolor sit amet consectetur. Accum...
-                    <Text style={{color: '#3b82f6'}}>more</Text>
+                    <Text style={{color: 'black'}}>more</Text>
                   </Text>
                 </View>
               </View>
@@ -752,10 +752,7 @@ const RestaurantDetailScreen: React.FC = () => {
     color: '#333',
     marginBottom: hp(1),
   },
-  ratingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
+
   ratingText: {
     fontSize: fp(2.5),
     fontWeight: '700',
@@ -834,29 +831,25 @@ const RestaurantDetailScreen: React.FC = () => {
   },
   recommendedDesc: {
     color: '#999',
-    fontSize: 13,
-    marginBottom: hp(5),
+    fontSize: fp(1.5),
+    marginBottom: hp(4),
   },
   addToCart: {
-    backgroundColor: '#3b82f6',
-    borderRadius: 20,
-    paddingVertical: 8,
-    paddingHorizontal: 15,
+    borderRadius: wp(3),
+    borderWidth:wp(0.3),
+    borderColor:colors.BLUE,
+    paddingVertical: hp(0.75),
     alignItems: 'center',
     marginTop: 5,
   },
   addToCartText: {
-    color: 'white',
+    color: colors.BLUE,
     fontWeight: '500',
   },
   customizableButton: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 20,
     paddingVertical: 8,
     paddingHorizontal: 15,
     alignItems: 'center',
-    marginTop: 8,
   },
   customizableText: {
     color: '#666',
