@@ -3,7 +3,6 @@ import {
   View,
   Text,
   Image,
-  ScrollView,
   TouchableOpacity,
   TextInput,
   StyleSheet,
@@ -18,13 +17,86 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import {colors} from '../src/utils/colors';
-import Icon from '../src/utils/icons';
-import {fp} from '../src/utils/dimension';
+import {colors} from '../utils/colors';
+import Icon from '../utils/icons';
+import {fp} from '../utils/dimension';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { RestaurantDetail } from '../services/Interface/GetRestaurantDetailResponse';
+import { GET_RESTAURENT_DETAIL } from '../services/Apifunctions';
 
-// Memoized smaller components
-const TabItem = memo(({active, label, onPress}) => (
+interface TabItemProps {
+  active: boolean;
+  label: string;
+  onPress: () => void;
+}
+
+interface FilterTabProps {
+  name: string;
+  isActive: boolean;
+  onToggle: (name: string) => void;
+}
+
+interface RestaurantItemProps {
+  name: string;
+  image: string;
+  onPress: () => void;
+}
+
+interface MoodItemProps {
+  label: string;
+  image: string;
+}
+
+interface RestaurantCardProps {
+  name: string;
+  image: string;
+  rating: number;
+  reviews: number;
+  hours: string;
+  cuisine: string;
+  location: string;
+  distance: number;
+}
+
+interface MainTab {
+  id: string;
+  name: string;
+}
+
+interface FilterTab {
+  id: string;
+  name: string;
+}
+
+interface MoodItem {
+  id: string;
+  label: string;
+  image: string;
+}
+
+interface RestaurantItem {
+  id: string;
+  name: string;
+  image: string;
+}
+
+interface FeaturedRestaurant {
+  id: string;
+  name: string;
+  image: string;
+  rating: number;
+  reviews: number;
+  hours: string;
+  cuisine: string;
+  location: string;
+  distance: number;
+}
+
+interface HomeScreenProps {
+  navigation: any; // Ideally, use a more specific type from React Navigation
+}
+
+const TabItem = memo(({active, label, onPress}: TabItemProps) => (
   <TouchableOpacity
     style={[styles.tabItem, active && styles.activeTab]}
     onPress={onPress}>
@@ -33,7 +105,8 @@ const TabItem = memo(({active, label, onPress}) => (
     </Text>
   </TouchableOpacity>
 ));
-const FilterTab = memo(({name, isActive, onToggle}) => (
+
+const FilterTab = memo(({name, isActive, onToggle}: FilterTabProps) => (
   <TouchableOpacity
     style={[styles.tabItem1, isActive && styles.activeTab1]}
     onPress={() => onToggle(name)}>
@@ -53,7 +126,7 @@ const FilterTab = memo(({name, isActive, onToggle}) => (
   </TouchableOpacity>
 ));
 
-const RestaurantItem = memo(({ name, image, onPress }) => (
+const RestaurantItem = memo(({ name, image, onPress }: RestaurantItemProps) => (
   <TouchableOpacity style={styles.restaurantItem} onPress={onPress}>
     <Image
       source={{uri: image}}
@@ -64,7 +137,7 @@ const RestaurantItem = memo(({ name, image, onPress }) => (
   </TouchableOpacity>
 ));
 
-const MoodItem = memo(({label, image}) => (
+const MoodItem = memo(({label, image}: MoodItemProps) => (
   <TouchableOpacity style={styles.moodItem}>
     <View style={styles.imageContainer}>
       <Image
@@ -80,7 +153,7 @@ const MoodItem = memo(({label, image}) => (
 ));
 
 const RestaurantCard = memo(
-  ({name, image, rating, reviews, hours, cuisine, location, distance}) => (
+  ({name, image, rating, reviews, hours, cuisine, location, distance}: RestaurantCardProps) => (
     <TouchableOpacity style={[styles.redCardWrapper, styles.shadowStyle]}>
       <View style={styles.restaurantCard}>
         <Image
@@ -127,13 +200,38 @@ const RestaurantCard = memo(
   ),
 );
 
-// Main component
-const HomeScreen = ({navigation}) => {
-  const [selectedTabs, setSelectedTabs] = useState([]);
-  const [activeMainTab, setActiveMainTab] = useState('Food');
+const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
+  const [selectedTabs, setSelectedTabs] = useState<string[]>([]);
+  const [activeMainTab, setActiveMainTab] = useState<string>('Food');
+  const [restaurants, setRestaurants] = useState<RestaurantDetail[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  
+  useEffect(() => {
+    // fetchRestaurantDetails();
+  }, []);
 
-  // Use callback for event handlers to prevent re-creation on each render
-  const toggleTab = useCallback(tabName => {
+  const fetchRestaurantDetails = async (): Promise<void> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await GET_RESTAURENT_DETAIL({ page_no: 1 });
+
+      if (response.isSuccessful && response?.data) {
+        setRestaurants(response.data.data);
+      } else {
+        setError(response.errorBody?.message || 'Failed to fetch restaurants');
+      }
+    } catch (e) {
+      console.log('Error fetching restaurants:', e);
+      setError('An unexpected error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
+ 
+  const toggleTab = useCallback((tabName: string): void => {
     setSelectedTabs(prevTabs => {
       if (prevTabs.includes(tabName)) {
         return prevTabs.filter(tab => tab !== tabName);
@@ -143,24 +241,21 @@ const HomeScreen = ({navigation}) => {
     });
   }, []);
 
-  const handleMainTabPress = useCallback(tabName => {
+  const handleMainTabPress = useCallback((tabName: string): void => {
     setActiveMainTab(tabName);
   }, []);
 
-  // Memoize check function
   const isTabActive = useCallback(
-    tabName => selectedTabs.includes(tabName),
+    (tabName: string): boolean => selectedTabs.includes(tabName),
     [selectedTabs],
   );
 
-  // Status bar effect only runs once
   useEffect(() => {
     StatusBar.setTranslucent(true);
     StatusBar.setBackgroundColor('transparent');
   }, []);
 
-  // Memoized data to prevent re-creating on every render
-  const moodItems = useMemo(
+  const moodItems: MoodItem[] = useMemo(
     () => [
       {
         id: '1',
@@ -181,7 +276,7 @@ const HomeScreen = ({navigation}) => {
     [],
   );
 
-  const restaurants = useMemo(
+  const restaurantItems: RestaurantItem[] = useMemo(
     () => [
       {
         id: '1',
@@ -202,7 +297,7 @@ const HomeScreen = ({navigation}) => {
     [],
   );
 
-  const restaurants2 = useMemo(
+  const restaurants2: RestaurantItem[] = useMemo(
     () => [
       {
         id: '4',
@@ -223,7 +318,7 @@ const HomeScreen = ({navigation}) => {
     [],
   );
 
-  const featuredRestaurants = useMemo(
+  const featuredRestaurants: FeaturedRestaurant[] = useMemo(
     () => [
       {
         id: '1',
@@ -251,7 +346,7 @@ const HomeScreen = ({navigation}) => {
     [],
   );
 
-  const mainTabs = useMemo(
+  const mainTabs: MainTab[] = useMemo(
     () => [
       {id: '1', name: 'All'},
       {id: '2', name: 'Food'},
@@ -261,7 +356,7 @@ const HomeScreen = ({navigation}) => {
     [],
   );
 
-  const filterTabs = useMemo(
+  const filterTabs: FilterTab[] = useMemo(
     () => [
       {id: '1', name: 'Dine-in'},
       {id: '2', name: 'Delivery'},
@@ -270,23 +365,28 @@ const HomeScreen = ({navigation}) => {
     [],
   );
 
-  // Render optimized lists with FlatList
   const renderMoodItem = useCallback(
-    ({item}) => <MoodItem label={item.label} image={item.image} />,
+    ({item}: {item: MoodItem}) => <MoodItem label={item.label} image={item.image} />,
     [],
   );
-  const handleRestaurantPress = (restaurant) => {
+  
+  const handleRestaurantPress = (restaurant: RestaurantItem): void => {
     navigation.navigate('RestaurantDetail', { restaurant });
   };
   
   const renderRestaurantItem = useCallback(
-    ({item}) => <RestaurantItem name={item.name} image={item.image}       onPress={() => handleRestaurantPress(item)}
-    />,
-    [],
+    ({item}: {item: RestaurantItem}) => (
+      <RestaurantItem 
+        name={item.name} 
+        image={item.image} 
+        onPress={() => handleRestaurantPress(item)}
+      />
+    ),
+    [navigation],
   );
 
   const renderMainTab = useCallback(
-    ({item}) => (
+    ({item}: {item: MainTab}) => (
       <TabItem
         label={item.name}
         active={activeMainTab === item.name}
@@ -297,7 +397,7 @@ const HomeScreen = ({navigation}) => {
   );
 
   const renderFilterTab = useCallback(
-    ({item}) => (
+    ({item}: {item: FilterTab}) => (
       <FilterTab
         name={item.name}
         isActive={isTabActive(item.name)}
@@ -307,7 +407,6 @@ const HomeScreen = ({navigation}) => {
     [isTabActive, toggleTab],
   );
 
-  // Memoized restaurant cards for better performance
   const restaurantCards = useMemo(
     () =>
       featuredRestaurants.map(restaurant => (
@@ -326,11 +425,9 @@ const HomeScreen = ({navigation}) => {
     [featuredRestaurants],
   );
 
-  // Extract HeaderComponent for better organization
   const HeaderComponent = useMemo(
     () => (
       <View>
-        
         <ImageBackground
           source={{
             uri: 'https://images.unsplash.com/photo-1511690656952-34342bb7c2f2?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
@@ -338,11 +435,11 @@ const HomeScreen = ({navigation}) => {
           style={[
             styles.locationBarBackground,
             { 
-              paddingTop: Platform.OS === 'ios' ? 50 : 0, // Add padding for iOS status bar
-              marginTop: Platform.OS === 'ios' ? -50 : 0, // Negative margin to offset the padding
+              paddingTop: Platform.OS === 'ios' ? 50 : 0, 
+              marginTop: Platform.OS === 'ios' ? -50 : 0, 
             }
           ]}
-                resizeMode="cover">
+          resizeMode="cover">
           <FlatList
             data={mainTabs}
             renderItem={renderMainTab}
@@ -367,22 +464,22 @@ const HomeScreen = ({navigation}) => {
               Lekki Phase 1 - Admiralty Way
             </Text>
             <View style={styles.locationIcons}>
-            <View style={styles.iconWithBadge}>
-    <TouchableOpacity style={styles.iconCircle}>
-      <Icon name="shopping-cart" size={fp(3.5)} color="#fff" />
-    </TouchableOpacity>
-    <View style={styles.badge}>
-      <Text style={styles.badgeText}>6</Text>
-    </View>
-  </View>
-  <View style={styles.iconWithBadge}>
-    <TouchableOpacity style={styles.iconCircle}>
-      <Icon name="notifications" size={fp(3.5)} color="#fff" />
-    </TouchableOpacity>
-    <View style={styles.badge}>
-      <Text style={styles.badgeText}>3</Text>
-    </View>
-  </View>
+              <View style={styles.iconWithBadge}>
+                <TouchableOpacity style={styles.iconCircle}>
+                  <Icon name="shopping-cart" size={fp(3.5)} color="#fff" />
+                </TouchableOpacity>
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>6</Text>
+                </View>
+              </View>
+              <View style={styles.iconWithBadge}>
+                <TouchableOpacity style={styles.iconCircle}>
+                  <Icon name="notifications" size={fp(3.5)} color="#fff" />
+                </TouchableOpacity>
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>3</Text>
+                </View>
+              </View>
 
               <TouchableOpacity style={styles.iconCircle}>
                 <Image
@@ -430,7 +527,7 @@ const HomeScreen = ({navigation}) => {
     <SafeAreaView style={styles.container} forceInset={{top: 'never'}}>
       <FlatList
         ListHeaderComponent={HeaderComponent}
-        data={[{key: 'content'}]} // Only one item to render the main content
+        data={[{key: 'content'}]} 
         renderItem={() => (
           <>
             <View style={styles.quickFilters}>
@@ -554,7 +651,7 @@ const HomeScreen = ({navigation}) => {
               </View>
 
               <FlatList
-                data={restaurants}
+                data={restaurantItems}
                 renderItem={renderRestaurantItem}
                 keyExtractor={item => item.id}
                 horizontal
@@ -715,7 +812,6 @@ badgeText: {
     backgroundColor: 'white',
   },
   scrollContent: {
-    // paddingBottom: hp(8),
   },
   tabBar: {
     flexDirection: 'row',

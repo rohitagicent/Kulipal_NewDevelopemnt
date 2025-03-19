@@ -9,8 +9,9 @@ export const colors = {
     BACKGROUND: '#FFF',
     BLUE:"#2A60F1",
     gray:"#4A4A4A",
-    grattext:"#656465"
-   
+    grattext:"#656465",
+    veg_Color:"#0DBA67",
+   nonveg_color:"#DE3557"
   };
   
 
