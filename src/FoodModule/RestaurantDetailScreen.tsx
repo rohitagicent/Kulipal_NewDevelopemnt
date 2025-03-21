@@ -15,8 +15,8 @@ import {colors} from '../utils/colors';
 import Icon from '../utils/icons';
 import {fp, wp, hp} from '../utils/dimension';
 import {useNavigation} from '@react-navigation/native';
+import FoodItemModal from './FoodItemModal';
 
-// Type definitions
 interface Service {
   icon: string;
   label: string;
@@ -132,9 +132,33 @@ const FilterTabComponent = memo(({name, isActive, onToggle}: FilterTabProps) => 
 
 const RestaurantDetailScreen: React.FC = () => {
   const navigation = useNavigation();
-
   const [selectedTabs, setSelectedTabs] = useState<string[]>([]);
-  
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedFood, setSelectedFood] = useState(null);
+  const [cartItems, setCartItems] = useState([]);
+  const handleAddToCartClick = (item: React.SetStateAction<null>) => {
+    setSelectedFood(item);
+    setModalVisible(true);
+  };
+
+  // Function to handle adding item to cart
+  const handleAddToCart = (item: { id: any; quantity: any; }) => {
+    const existingItemIndex = cartItems.findIndex(
+      cartItem => cartItem.id === item.id
+    );
+
+    if (existingItemIndex >= 0) {
+      // Item already exists in cart, update quantity
+      const updatedCartItems = [...cartItems];
+      updatedCartItems[existingItemIndex].quantity += item.quantity;
+      setCartItems(updatedCartItems);
+    } else {
+      // Item is new, add to cart
+      setCartItems([...cartItems, item]);
+    }
+    
+    // You could show a toast here to confirm item was added
+  };
   const filterTabs = useMemo<FilterTab[]>(
     () => [
       {id: '1', name: 'Dine-in'},
@@ -195,6 +219,7 @@ const RestaurantDetailScreen: React.FC = () => {
   );
   
   return (
+    <>
     <ScrollView style={{flex: 1, backgroundColor: '#f9f9f9'}}>
       <View style={{height: 240, position: 'relative'}}>
         <Image
@@ -527,8 +552,10 @@ const RestaurantDetailScreen: React.FC = () => {
                     style={styles.recommendedImage}
                   />
                   <View style={{flexDirection: 'column', marginTop: 5}}>
-                    <TouchableOpacity style={styles.addToCart}>
-                      <Text style={styles.addToCartText}>Add to Cart</Text>
+                  <TouchableOpacity 
+                    style={styles.addToCart}
+                    onPress={() => handleAddToCartClick(item)}
+                  >                      <Text style={styles.addToCartText}>Add to Cart</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity style={styles.customizableButton}>
@@ -626,6 +653,13 @@ const RestaurantDetailScreen: React.FC = () => {
         </View>
       </View>
     </ScrollView>
+    <FoodItemModal
+        isVisible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        foodItem={selectedFood}
+        onAddToCart={handleAddToCart}
+      />
+    </>
   );
 };
 
