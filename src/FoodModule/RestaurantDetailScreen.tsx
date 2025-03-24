@@ -493,7 +493,7 @@ const RestaurantDetailScreen: React.FC = () => {
             </View>
           </View>
 
-          <View style={{paddingHorizontal: 16}}>
+          <View style={{paddingHorizontal: wp(4)}}>
             <Text style={styles.sectionTitle}>Must Try</Text>
             <FlatList
               data={categories}

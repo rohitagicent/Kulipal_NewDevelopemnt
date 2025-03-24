@@ -20,9 +20,9 @@ import {
 import {colors} from '../utils/colors';
 import Icon from '../utils/icons';
 import {fp} from '../utils/dimension';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { RestaurantDetail } from '../services/Interface/GetRestaurantDetailResponse';
-import { GET_RESTAURENT_DETAIL } from '../services/Apifunctions';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {RestaurantDetail} from '../services/Interface/GetRestaurantDetailResponse';
+import {GET_RESTAURENT_DETAIL} from '../services/Apifunctions';
 
 interface TabItemProps {
   active: boolean;
@@ -126,7 +126,7 @@ const FilterTab = memo(({name, isActive, onToggle}: FilterTabProps) => (
   </TouchableOpacity>
 ));
 
-const RestaurantItem = memo(({ name, image, onPress }: RestaurantItemProps) => (
+const RestaurantItem = memo(({name, image, onPress}: RestaurantItemProps) => (
   <TouchableOpacity style={styles.restaurantItem} onPress={onPress}>
     <Image
       source={{uri: image}}
@@ -153,7 +153,16 @@ const MoodItem = memo(({label, image}: MoodItemProps) => (
 ));
 
 const RestaurantCard = memo(
-  ({name, image, rating, reviews, hours, cuisine, location, distance}: RestaurantCardProps) => (
+  ({
+    name,
+    image,
+    rating,
+    reviews,
+    hours,
+    cuisine,
+    location,
+    distance,
+  }: RestaurantCardProps) => (
     <TouchableOpacity style={[styles.redCardWrapper, styles.shadowStyle]}>
       <View style={styles.restaurantCard}>
         <Image
@@ -206,17 +215,16 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
   const [restaurants, setRestaurants] = useState<RestaurantDetail[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   useEffect(() => {
-    // fetchRestaurantDetails();
+    fetchRestaurantDetails();
   }, []);
 
   const fetchRestaurantDetails = async (): Promise<void> => {
     setLoading(true);
     setError(null);
-
     try {
-      const response = await GET_RESTAURENT_DETAIL({ page_no: 1 });
+      const response = await GET_RESTAURENT_DETAIL({page_no: 1});
 
       if (response.isSuccessful && response?.data) {
         setRestaurants(response.data.data);
@@ -230,7 +238,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
       setLoading(false);
     }
   };
- 
+
   const toggleTab = useCallback((tabName: string): void => {
     setSelectedTabs(prevTabs => {
       if (prevTabs.includes(tabName)) {
@@ -366,19 +374,21 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
   );
 
   const renderMoodItem = useCallback(
-    ({item}: {item: MoodItem}) => <MoodItem label={item.label} image={item.image} />,
+    ({item}: {item: MoodItem}) => (
+      <MoodItem label={item.label} image={item.image} />
+    ),
     [],
   );
-  
+
   const handleRestaurantPress = (restaurant: RestaurantItem): void => {
-    navigation.navigate('RestaurantDetail', { restaurant });
+    navigation.navigate('RestaurantDetail', {restaurant});
   };
-  
+
   const renderRestaurantItem = useCallback(
     ({item}: {item: RestaurantItem}) => (
-      <RestaurantItem 
-        name={item.name} 
-        image={item.image} 
+      <RestaurantItem
+        name={item.name}
+        image={item.image}
         onPress={() => handleRestaurantPress(item)}
       />
     ),
@@ -434,10 +444,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
           }}
           style={[
             styles.locationBarBackground,
-            { 
-              paddingTop: Platform.OS === 'ios' ? 50 : 0, 
-              marginTop: Platform.OS === 'ios' ? -50 : 0, 
-            }
+            {
+              paddingTop: Platform.OS === 'ios' ? 50 : 0,
+              marginTop: Platform.OS === 'ios' ? -50 : 0,
+            },
           ]}
           resizeMode="cover">
           <FlatList
@@ -521,13 +531,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
     ),
     [mainTabs, renderMainTab],
   );
+
   const insets = useSafeAreaInsets();
 
   return (
     <SafeAreaView style={styles.container} forceInset={{top: 'never'}}>
       <FlatList
         ListHeaderComponent={HeaderComponent}
-        data={[{key: 'content'}]} 
+        data={[{key: 'content'}]}
         renderItem={() => (
           <>
             <View style={styles.quickFilters}>
@@ -731,34 +742,30 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginLeft: wp(2),
   },
-
-iconWithBadge: {
-  position: 'relative',
-  marginHorizontal: 5,
-},
-
-
-
-badge: {
-  position: 'absolute',
-  top: -5,     // positions it to the top
-  right: -5,   // positions it to the right (45 degrees)
-  backgroundColor: colors.WHITE,
-  borderRadius: 10,
-  borderColor:"black",
-  borderWidth:1,
-  height: 20,
-  minWidth: 20,
-  justifyContent: 'center',
-  alignItems: 'center',
-  paddingHorizontal: 4,
-  zIndex: 1,
-},
-badgeText: {
-  color: 'black',
-  fontSize: 12,
-  fontWeight: 'bold',
-},
+  iconWithBadge: {
+    position: 'relative',
+    marginHorizontal: 5,
+  },
+  badge: {
+    position: 'absolute',
+    top: -5, // positions it to the top
+    right: -5, // positions it to the right (45 degrees)
+    backgroundColor: colors.WHITE,
+    borderRadius: 10,
+    borderColor: 'black',
+    borderWidth: 1,
+    height: 20,
+    minWidth: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 4,
+    zIndex: 1,
+  },
+  badgeText: {
+    color: 'black',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
   profilePic: {
     width: wp(7),
     height: wp(7),
@@ -785,11 +792,10 @@ badgeText: {
     shadowOpacity: 0.1,
     shadowRadius: 1,
     height: wp(12),
-
   },
   searchInput: {
     flex: 1,
-    fontSize: fp(2),
+    fontSize: fp(1.95),
     color: '#333',
     marginLeft: wp(2),
   },
@@ -811,8 +817,7 @@ badgeText: {
     flex: 1,
     backgroundColor: 'white',
   },
-  scrollContent: {
-  },
+  scrollContent: {},
   tabBar: {
     flexDirection: 'row',
     borderBottomColor: '#eee',
@@ -824,16 +829,16 @@ badgeText: {
   },
   tabItem: {
     paddingVertical: hp(1),
-    height:Platform.OS === "ios" ?  hp(4):hp(5),
+    height: Platform.OS === 'ios' ? hp(4) : hp(5),
     paddingHorizontal: wp(7),
     borderRadius: wp(3),
     backgroundColor: 'rgba(255, 255, 255, 0.3)',
     marginHorizontal: wp(1),
-    marginTop:hp(5)
+    marginTop: hp(5),
   },
   tabItem1: {
     paddingVertical: hp(1.2),
-    paddingHorizontal: Platform.OS === "ios" ? wp(4):wp(5),
+    paddingHorizontal: Platform.OS === 'ios' ? wp(4) : wp(5),
     marginRight: wp(5),
     borderRadius: 20,
     borderColor: '#E4E4E4',

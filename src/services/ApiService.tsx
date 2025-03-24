@@ -1,10 +1,12 @@
 import axios, {AxiosInstance} from 'axios';
 import {Response} from './Response';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
 interface ApiEndpoint {
   url: string;
   method: 'get' | 'post' | 'put' | 'delete';
 }
+
 export class ApiService {
   private readonly axiosInstance: AxiosInstance;
   constructor(axiosInstance: AxiosInstance) {

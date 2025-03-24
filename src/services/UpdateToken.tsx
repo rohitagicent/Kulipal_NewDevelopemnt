@@ -1,15 +1,19 @@
 import axios from 'axios';
-import { Alert, Platform } from 'react-native';
+import {Alert, Platform} from 'react-native';
 import DeviceInfo from 'react-native-device-info';
-import { GETPROFILE, SendDeviceToken, SignUpUser } from './Apifunctions';
-import { useAuth } from '../AuthContext/AuthContext';
-export const updateDeviceToken = async (deviceToken) => {
-  const { userProfileData, setUserProfileData } = useAuth();
+import {GETPROFILE, SendDeviceToken, SignUpUser} from './Apifunctions';
+import {useAuth} from '../AuthContext/AuthContext';
+
+export const updateDeviceToken = async deviceToken => {
+  const {userProfileData, setUserProfileData} = useAuth();
   const deviceType = Platform.OS === 'ios' ? 'I' : 'A';
+  console.log(DeviceInfo,'------------')
   const deviceMakeModel = DeviceInfo.getModel();
   const deviceOsVersion = DeviceInfo.getSystemVersion();
   const installedAppVersion = DeviceInfo.getVersion();
   const date = new Date();
+
+
   const getTimeOffset = () => {
     const date = new Date();
     const offsetInMinutes = date.getTimezoneOffset();
@@ -17,12 +21,15 @@ export const updateDeviceToken = async (deviceToken) => {
     const hoursOffset = Math.floor(invertedOffset / 60);
     const minutesOffset = invertedOffset % 60;
     const sign = hoursOffset < 0 ? '-' : '+';
-    const formattedOffset = `${sign}${Math.abs(hoursOffset).toString().padStart(2, '0')}:${Math.abs(minutesOffset).toString().padStart(2, '0')}`;
+    const formattedOffset = `${sign}${Math.abs(hoursOffset)
+      .toString()
+      .padStart(2, '0')}:${Math.abs(minutesOffset)
+      .toString()
+      .padStart(2, '0')}`;
     return formattedOffset;
   };
-  
-  const timeOffsetInMinutes = date.getTimezoneOffset();
 
+  const timeOffsetInMinutes = date.getTimezoneOffset();
 
   const payload = {
     device_type: deviceType,
@@ -30,7 +37,7 @@ export const updateDeviceToken = async (deviceToken) => {
     device_make_model: deviceMakeModel,
     device_os_version: deviceOsVersion,
     installed_app_version: installedAppVersion,
-    time_offset:timeOffsetInMinutes
+    time_offset: timeOffsetInMinutes,
   };
   // const CallGetPRofile = async () => {
   //   let data = {}
@@ -50,9 +57,8 @@ export const updateDeviceToken = async (deviceToken) => {
   // }
 
   try {
-
     const response = await SendDeviceToken(payload);
-   
+
     // CallGetPRofile()
   } catch (error) {
     throw error;
