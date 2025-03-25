@@ -16,6 +16,7 @@ import Icon from '../utils/icons';
 import {fp, wp, hp} from '../utils/dimension';
 import {useNavigation} from '@react-navigation/native';
 import FoodItemModal from './FoodItemModal';
+import FastImage from 'react-native-fast-image';
 
 interface Service {
   icon: string;
@@ -222,12 +223,20 @@ const RestaurantDetailScreen: React.FC = () => {
     <>
     <ScrollView style={{flex: 1, backgroundColor: '#f9f9f9'}}>
       <View style={{height: 240, position: 'relative'}}>
-        <Image
+        {/* <Image
           source={{
             uri: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836',
           }}
           style={{width: '100%', height: 240}}
-        />
+        /> */}
+         <FastImage
+          style={{width: '100%', height: 240}}
+          source={{
+            uri: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836',
+    priority: FastImage.priority.high,
+  }}
+  resizeMode={FastImage.resizeMode.cover}
+/>
         <View
           style={{
             position: 'absolute',
@@ -528,11 +537,19 @@ const RestaurantDetailScreen: React.FC = () => {
               renderItem={({item}) => (
                 <TouchableOpacity style={styles.moodItem}>
                   <View style={styles.imageContainer}>
-                    <Image
+                    {/* <Image
                       source={{uri: item.img}}
                       style={styles.moodImage}
                       resizeMode="cover"
-                    />
+                    /> */}
+                       <FastImage
+                      style={styles.moodImage}
+                      source={{
+            uri: item.img,
+    priority: FastImage.priority.high,
+  }}
+  resizeMode={FastImage.resizeMode.cover}
+/>
                     <View style={styles.textOverlay}>
                       <Text style={styles.moodLabel}>{item.name}</Text>
                     </View>
@@ -547,10 +564,18 @@ const RestaurantDetailScreen: React.FC = () => {
             {recommended.map(item => (
               <View key={item.id} style={styles.recommendedCard}>
                 <View>
-                  <Image
+                  {/* <Image
                     source={{uri: item.image}}
                     style={styles.recommendedImage}
-                  />
+                  /> */}
+                    <FastImage
+                      style={styles.recommendedImage}
+                      source={{
+            uri: item.image,
+    priority: FastImage.priority.high,
+  }}
+  resizeMode={FastImage.resizeMode.cover}
+/>
                   <View style={{flexDirection: 'column', marginTop: 5}}>
                   <TouchableOpacity 
                     style={styles.addToCart}

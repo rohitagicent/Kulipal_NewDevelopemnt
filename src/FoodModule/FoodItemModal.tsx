@@ -13,6 +13,7 @@ import {
 import Icon from '../utils/icons';
 import {colors} from '../utils/colors';
 import {fp, wp, hp} from '../utils/dimension';
+import FastImage from 'react-native-fast-image';
 
 const {height} = Dimensions.get('window');
 
@@ -93,11 +94,19 @@ const FoodItemModal = ({isVisible, onClose, foodItem, onAddToCart}) => {
                 />
               </TouchableOpacity>
               <View style={styles.foodDetails}>
-                <Image
+                {/* <Image
                   source={{uri: foodItem?.image}}
                   style={styles.restaurantCardImage}
                   resizeMode="cover"
-                />
+                /> */}
+                  <FastImage
+                  style={styles.restaurantCardImage}
+                  source={{
+            uri: foodItem?.image,
+    priority: FastImage.priority.high,
+  }}
+  resizeMode={FastImage.resizeMode.cover}
+/>
                 <Text style={styles.foodTitle1}>{'Fast Food '}</Text>
                 <View
                   style={{
