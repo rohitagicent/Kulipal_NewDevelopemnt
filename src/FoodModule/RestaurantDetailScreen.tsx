@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, memo} from 'react';
+import React, { useState, useMemo, useCallback, memo } from 'react';
 import {
   View,
   Text,
@@ -195,7 +195,7 @@ const RestaurantDetailScreen: React.FC = () => {
   );
   
   return (
-    <ScrollView style={{flex: 1, backgroundColor: '#f9f9f9'}}>
+    <ScrollView style={{flex: 1, backgroundColor: 'grey'}}>
       <View style={{height: 240, position: 'relative'}}>
         <Image
           source={{
@@ -317,7 +317,7 @@ const RestaurantDetailScreen: React.FC = () => {
             style={{
               flexDirection: 'row',
               justifyContent: 'space-between',
-              marginVertical: hp(1),
+              // gap: hp(0.5),
             }}>
             <TouchableOpacity style={styles.tabButtonActive}>
               <Text style={styles.tabTextActive}>Overview</Text>
@@ -768,16 +768,19 @@ const RestaurantDetailScreen: React.FC = () => {
     marginLeft: wp(0.5),
   },
   tabButton: {
-    paddingVertical: hp(1),
-    paddingHorizontal: wp(3),
-    borderRadius: wp(3),
+    paddingVertical: hp(0.8),
+    paddingHorizontal: wp(2.5),
+    borderRadius: wp(5),
     backgroundColor: 'skyblue',
   },
   tabText: {color: 'white'},
   tabButtonActive: {
-    paddingVertical: hp(1),
-    paddingHorizontal: wp(3),
-    borderRadius: wp(3),
+    // paddingVertical: hp(1),
+    // paddingHorizontal: wp(3),
+    // borderRadius: wp(3),
+    paddingVertical: hp(0.8),
+    paddingHorizontal: wp(2.5),
+    borderRadius: wp(5),
     backgroundColor: 'white',
   },
   tabTextActive: {color: colors.BLUE, fontWeight: 'bold'},

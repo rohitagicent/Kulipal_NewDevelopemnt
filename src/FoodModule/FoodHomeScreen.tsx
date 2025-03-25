@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useMemo, useCallback, memo} from 'react';
+import React, { useEffect, useState, useMemo, useCallback, memo } from 'react';
 import {
   View,
   Text,
@@ -12,7 +12,7 @@ import {
   FlatList,
   Platform,
 } from 'react-native';
-import {RFValue} from 'react-native-responsive-fontsize';
+import { RFValue } from 'react-native-responsive-fontsize';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -693,7 +693,7 @@ const styles = StyleSheet.create({
   locationBarBackground: {
     width: '100%',
     height: hp(30),
-    paddingTop: StatusBar.currentHeight || hp(4),
+    // paddingTop: StatusBar.currentHeight || hp(4),
     paddingBottom: hp(2),
     borderBottomLeftRadius: wp(5),
     borderBottomRightRadius: wp(5),
