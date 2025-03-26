@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   StyleSheet,
   SafeAreaView,
   ScrollView,
+  Modal,
 } from 'react-native';
 import {fp, wp, hp} from '../../../utils/dimension';
 import {colors} from '../../../utils/colors';
@@ -15,44 +16,97 @@ import Icon from '../../../utils/icons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useNavigation} from '@react-navigation/native';
 import SelectDropdown from 'react-native-select-dropdown';
-const SimplifiedOnboarding = () => {
-  const navigation = useNavigation();
-  const [currentStep, setCurrentStep] = useState(0);
-  const [formData, setFormData] = useState({
-    businessType: '',
-    name: '',
-    phone: '',
-    email: '',
-    password: '',
-    confirmpassword: '',
+import {OtpInput} from 'react-native-otp-entry';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-  });
-  const [rememberMe, setRememberMe] = useState(false);
+interface FormData {
+  businessType: string;
+  name: string;
+  phone: string;
+  email: string;
+  password: string;
+  confirmpassword: string;
+}
 
-  const updateFormData = (key, value) => {
-    setFormData(prevData => ({
-      ...prevData,
-      [key]: value,
-    }));
-  };
+interface BusinessType {
+  id: string;
+  title: string;
+  icon: string;
+  image: any;
+}
 
-  const nextStep = () => {
-    setCurrentStep(prevStep => prevStep + 1);
-  };
+interface EmojiOption {
+  title: string;
+  icon: string;
+}
 
-  const prevStep = () => {
-    setCurrentStep(prevStep => Math.max(0, prevStep - 1));
-  };
+interface VerifyMode {
+  id: number;
+  title: string;
+  icon: string;
+  contact: string;
+}
 
-  const submitForm = () => {
-    console.log('Form submitted:', formData);
-    // Here you would typically make an API call
-    alert('Account created successfully!');
-  };
+interface SimplifiedOnboardingProps {
+  navigation: any; // Ideally, use a more specific type from React Navigation
+}
+
+const SimplifiedOnboarding: React.FC<SimplifiedOnboardingProps> = ({navigation}) => {
+const [currentStep, setCurrentStep] = useState<number>(0);
+const [modalOpen, setModalOpen] = useState<boolean>(false);
+const [otp, setOtp] = useState<string>('');
+const [formData, setFormData] = useState<FormData>({
+  businessType: '',
+  name: '',
+  phone: '',
+  email: '',
+  password: '',
+  confirmpassword: '',
+});
+const [rememberMe, setRememberMe] = useState<boolean>(false);
+const updateFormData = (key: keyof FormData, value: string): void => {
+  setFormData(prevData => ({
+    ...prevData,
+    [key]: value,
+  }));
+};
+
+const nextStep = (): void => {
+  setCurrentStep(prevStep => prevStep + 1);
+};
+
+const prevStep = (): void => {
+  setCurrentStep(prevStep => Math.max(0, prevStep - 1));
+};
+
+const submitForm = async (): Promise<void> => {
+  console.log('Form submitted:', formData);
+  try {
+    await AsyncStorage.setItem('formData', JSON.stringify(formData));
+    setCurrentStep(prev => prev + 1);
+  } catch (error) {
+    console.error('Error saving form data:', error);
+  }
+};
+
+const handleOtpChange = (code: string): void => {
+  setOtp(code);
+};
+
+const verifyPinSubmit = (): void => {
+  console.log(123456);
+  setModalOpen(true);
+  console.log(modalOpen, 'open');
+};
+
+const setUpBusiness = (): void => {
+  navigation.navigate('BusinessProfileSetup');
+};
 
   // Business Type Selection Screen
-  const BusinessTypeScreen = () => {
-    const businessTypes = [
+  // eslint-disable-next-line react/no-unstable-nested-components
+  function BusinessTypeScreen() {
+    const businessTypes: BusinessType[] = [
       {
         id: 'food_vendor',
         title: 'I am a Food Vendor',
@@ -83,11 +137,10 @@ const SimplifiedOnboarding = () => {
           </TouchableOpacity>
         </View>
 
-        <View style={{alignItems: 'center'}}>
+        <View style={{ alignItems: 'center' }}>
           <Image
             source={require('../../../assests/images/onboardimage.png')}
-            resizeMode="contain"
-          />
+            resizeMode="contain" />
         </View>
 
         <View style={styles.optionsContainer}>
@@ -100,14 +153,17 @@ const SimplifiedOnboarding = () => {
               ]}
               onPress={() => updateFormData('businessType', type.id)}>
               <View style={styles.iconContainer}>
-                <Image source={type.image} resizeMode="contain" />
+                <Image
+                  style={styles.image}
+                  source={type.image}
+                  resizeMode="contain" />
               </View>
               <Text style={styles.optionText}>{type.title}</Text>
               <View
                 style={[
                   styles.radioOuter,
                   formData.businessType === type.id &&
-                    styles.radioOuterSelected,
+                  styles.radioOuterSelected,
                 ]}>
                 {formData.businessType === type.id && (
                   <View style={styles.radioInner} />
@@ -128,34 +184,33 @@ const SimplifiedOnboarding = () => {
         </TouchableOpacity>
       </View>
     );
-  };
+  }
 
   // Registration Form Screen
   const RegistrationFormScreen = () => {
-    const [passwordVisible, setPasswordVisible] = useState(false);
-    const updateFormData = (key, value) => {
-      setFormData(prevData => ({
-        ...prevData,
-        [key]: value,
-      }));
-    };
+    const [passwordVisible, setPasswordVisible] = useState<boolen>(false);
+    // const updateFormData = (key, value) => {
+    //   setFormData(prevData => ({
+    //     ...prevData,
+    //     [key]: value,
+    //   }));
+    // };
     const togglePasswordVisibility = () => {
       setPasswordVisible(!passwordVisible);
     };
 
-    const isFormValid = () => {
-      return (
-        formData.name && formData.phone && formData.email && formData.password
-      );
+    const isFormValid = (): boolean => {
+      return !!(formData.name && formData.phone && formData.email && formData.password);
     };
-    const emojisWithIcons = [
+
+    const emojisWithIcons: EmojiOption[] = [
       {title: 'Social Media', icon: 'emoticon-happy-outline'},
       {title: 'Friend Referral', icon: 'emoticon-cool-outline'},
       {title: 'Google Search', icon: 'emoticon-lol-outline'},
       {title: 'Advertisement', icon: 'emoticon-sad-outline'},
       {title: 'Other', icon: 'emoticon-cry-outline'},
     ];
-   
+
     return (
       <View style={styles.screenContainer}>
         <View style={styles.backButtonContainer}>
@@ -401,12 +456,213 @@ const SimplifiedOnboarding = () => {
         <View style={styles.loginLinkContainer}>
           <Text style={styles.loginText}>
             Already have an account?{' '}
-            <Text style={styles.loginLink1} 
-              onPress={() => navigation.navigate("LoginScreenVendor")}
-            >Login</Text>
+            <Text
+              style={styles.loginLink1}
+              onPress={() => navigation.navigate('LoginScreenVendor')}>
+              Login
+            </Text>
           </Text>
         </View>
       </View>
+    );
+  };
+
+  // Verify Contact Info Screen
+  const VerifyContactInfoScreen = () => {
+    const verifyMode: VerifyMode[] = [
+      {
+        id: 1,
+        title: 'Verify via phone number',
+        icon: 'phone',
+        contact: '9876543210',
+      },
+      {
+        id: 2,
+        title: 'Verify via Mail',
+        icon: 'mail',
+        contact: 'example@gmail.com',
+      },
+    ];
+
+    return (
+      <>
+        <View style={styles.screenContainer}>
+          <View style={styles.backButtonContainer}>
+            <TouchableOpacity style={styles.backButton1} onPress={prevStep}>
+              <Icon
+                name="chevron-left"
+                size={fp(3.2)}
+                color={colors.icongray}
+              />
+            </TouchableOpacity>
+          </View>
+
+          <View style={{alignItems: 'center'}}>
+            <Image
+              source={require('../../../assests/images/verifyContactInfo.png')}
+              resizeMode="contain"
+            />
+          </View>
+
+          <View style={{marginTop: hp(3)}}>
+            {verifyMode.map((type, index) => (
+              <>
+                <TouchableOpacity
+                  key={type.id}
+                  style={[
+                    styles.optionCard,
+                    formData.businessType === type.id &&
+                      styles.selectedOptionCard,
+                  ]}
+                  onPress={() => updateFormData('businessType', type.id)}>
+                  <View
+                    style={{justifyContent: 'center', flexDirection: 'row'}}>
+                    <Icon
+                      name={type.icon}
+                      type="Entypo"
+                      size={fp(3.2)}
+                      color={colors.icongray}
+                    />
+                    <View>
+                      <Text style={styles.optionText}>{type.title}</Text>
+                      <Text style={styles.optionText}>{type.contact}</Text>
+                    </View>
+                  </View>
+
+                  <View
+                    style={[
+                      styles.radioOuter,
+                      formData.businessType === type.id &&
+                        styles.radioOuterSelected,
+                    ]}>
+                    {formData.businessType === type.id && (
+                      <View style={styles.radioInner} />
+                    )}
+                  </View>
+                </TouchableOpacity>
+                {index !== verifyMode.length - 1 && (
+                  <View
+                    style={[styles.dividerContainer, {marginBottom: hp(2)}]}>
+                    <View style={styles.divider} />
+                    <Text style={styles.dividerText}>Or</Text>
+                    <View style={styles.divider} />
+                  </View>
+                )}
+              </>
+            ))}
+          </View>
+        </View>
+        <TouchableOpacity
+          style={[
+            styles.button,
+            !formData.businessType && styles.disabledButton,
+          ]}
+          onPress={nextStep}
+          disabled={!formData.businessType}>
+          <Text style={styles.buttonText}>Continue</Text>
+        </TouchableOpacity>
+      </>
+    );
+  };
+
+  // Verify Contact PIN Screen
+  const VerifyContactPinScreen = () => {
+    return (
+      <>
+        <View style={styles.screenContainer}>
+          <View style={styles.backButtonContainer}>
+            <TouchableOpacity style={styles.backButton1} onPress={prevStep}>
+              <Icon
+                name="chevron-left"
+                size={fp(3.2)}
+                color={colors.icongray}
+              />
+            </TouchableOpacity>
+          </View>
+
+          <View style={{alignItems: 'center'}}>
+            <Image
+              source={require('../../../assests/images/verifyContactPin.png')}
+              resizeMode="contain"
+            />
+          </View>
+
+          <View style={styles.otp_container}>
+            <OtpInput
+              numberOfDigits={6}
+              onTextChange={handleOtpChange}
+              focusColor={colors.BLUE}
+              autoFocus
+              theme={{
+                containerStyle: styles.otpContainer,
+                pinCodeContainerStyle: styles.otpBox,
+                pinCodeTextStyle: styles.otpText,
+              }}
+            />
+          </View>
+
+          <View style={styles.loginLinkContainer}>
+            <Text style={styles.resendText}>
+              Didn't receive a code?{' '}
+              <Text
+                style={styles.loginLink1}
+                onPress={() => navigation.navigate('LoginScreenVendor')}>
+                Resend
+              </Text>
+            </Text>
+            <Text style={styles.resendTime}>Resend in 2 min</Text>
+          </View>
+        </View>
+        <TouchableOpacity
+          style={[
+            styles.button,
+            !formData.businessType && styles.disabledButton,
+          ]}
+          onPress={verifyPinSubmit}
+          disabled={!formData.businessType}>
+          <Text style={styles.buttonText}>Submit</Text>
+        </TouchableOpacity>
+        {/* model */}
+        {modalOpen && (
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalOpen}
+            onRequestClose={() => setModalOpen(false)} // Handles Android back button
+          >
+            <View style={styles.modalOverlay}>
+              <View style={styles.modalContainer}>
+                <View style={{alignItems: 'center', marginVertical: wp(2)}}>
+                  <Image
+                    source={require('../../../assests/images/profileModalTick.png')}
+                    resizeMode="contain"
+                  />
+                </View>
+                <Text style={styles.modalTitle}>
+                  Welcome To Kulipal {'\n'} Business!
+                </Text>
+                <Text style={styles.modalText}>
+                  Let’s get your business ready to receive customers. Just a few
+                  steps left!
+                </Text>
+                <TouchableOpacity
+                  style={[styles.buttonModal]}
+                  onPress={setUpBusiness}
+                  disabled={!formData.businessType}>
+                  <Text style={styles.buttonText}>Set Up Business Profile</Text>
+                  <Icon
+                    name="doubleright"
+                    type="AntDesign"
+                    color={colors.WHITE}
+                    size={fp(2.2)}
+                    style={styles.buttonIcon}
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+        )}
+      </>
     );
   };
 
@@ -415,6 +671,8 @@ const SimplifiedOnboarding = () => {
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         {currentStep === 0 && <BusinessTypeScreen />}
         {currentStep === 1 && <RegistrationFormScreen />}
+        {currentStep === 2 && <VerifyContactInfoScreen />}
+        {currentStep === 3 && <VerifyContactPinScreen />}
       </ScrollView>
     </SafeAreaView>
   );
@@ -580,6 +838,13 @@ const styles = StyleSheet.create({
 
   iconContainer: {
     marginRight: 10,
+    backgroundColor: colors.BLUE,
+    padding: wp(1.5),
+    borderRadius: 25,
+  },
+  image: {
+    width: wp(5),
+    height: wp(5),
   },
   selectedText: {
     flex: 1,
@@ -601,13 +866,13 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
   },
-  iconContainer: {
-    backgroundColor: colors.BLUE,
-    borderRadius: wp(1.5),
-    padding: wp(1.5),
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  // iconContainer: {
+  //   backgroundColor: colors.BLUE,
+  //   borderRadius: wp(1.5),
+  //   padding: wp(1.5),
+  //   alignItems: 'center',
+  //   justifyContent: 'center',
+  // },
   iconContainer1: {
     backgroundColor: '#E6EAF5',
     borderRadius: wp(1.5),
@@ -649,9 +914,14 @@ const styles = StyleSheet.create({
   optionsContainer: {
     marginTop: hp(8),
   },
+  otp_container: {
+    width: '100%',
+    marginTop: hp(6),
+  },
   optionCard: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     backgroundColor: '#FFF',
     borderRadius: wp(3),
     padding: 18,
@@ -693,6 +963,18 @@ const styles = StyleSheet.create({
     padding: 15,
     alignItems: 'center',
     marginTop: hp(3),
+  },
+  buttonModal: {
+    width: '100%',
+    backgroundColor: colors.BLUE,
+    borderRadius: 50,
+    padding: 15,
+    alignItems: 'center',
+    marginBottom: hp(2),
+    flexDirection:'row',
+    justifyContent:'center',
+    alignItems:'center',
+    gap: wp(1)
   },
   buttonText: {
     color: '#FFF',
@@ -759,6 +1041,57 @@ const styles = StyleSheet.create({
   loginLink1: {
     color: colors.BLUE,
     fontWeight: 'bold',
+  },
+  otpContainer: {marginVertical: 20, alignSelf: 'center'}, // Center the OTP input
+  otpBox: {
+    width: wp(13.5),
+    height: wp(13.5),
+    backgroundColor: colors.lightgray,
+    borderRadius: 10, // Slight rounding for modern look
+    textAlign: 'center',
+  },
+  otpText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'black',
+    textAlign: 'center',
+  },
+  resendText: {
+    fontSize: fp(2),
+    color: '#666',
+  },
+  resendTime: {
+    fontSize: fp(1.7),
+    color: '#515151',
+    marginTop: wp(1),
+  },
+  // modal styles
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+  },
+  modalContainer: {
+    backgroundColor: 'white',
+    padding: wp(6),
+    borderRadius: 10,
+    width: '90%',
+    alignItems: 'center',
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: fp(3.2),
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+    color: '#515151',
+  },
+  modalText: {
+    fontSize: fp(1.8),
+    textAlign: 'center',
+    marginBottom: 15,
+    color: '#777777',
   },
 });
 

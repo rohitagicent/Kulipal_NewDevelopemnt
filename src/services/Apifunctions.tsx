@@ -3,8 +3,6 @@ import { GetRestaurantDetailResponse } from './Interface/GetRestaurantDetailResp
 import {Response} from './Response';
 import {API_ENDPOINTS} from './constant/ApiConstant';
 
-
-
 //  for fetch the restaurent details 
 
 export async function GET_RESTAURENT_DETAIL(
@@ -14,7 +12,7 @@ export async function GET_RESTAURENT_DETAIL(
     page_no: userData.page_no
   };
   try {
-    console.log(requestData,"requestDatarequestData")
+    console.log(requestData, "requestDatarequestData")
     const response = await apiService.post<GetRestaurantDetailResponse>(
       API_ENDPOINTS.GET_RESTAURENT_DETAIL,
       requestData,

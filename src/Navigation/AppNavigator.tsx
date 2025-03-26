@@ -5,7 +5,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SplashScreen from '../Screen/common/SplashScreen';
 import UserTypeSelectionScreen from '../Screen/common/UserTypeSelectionScreen';
-import AuthNavigator from './AuthNavigator';
 import CustomerNavigator from './CustomerNavigator';
 import VendorNavigator from './VendorNavigator';
 import { setAuthToken, setUserType } from '../store/authActions';
@@ -14,12 +13,13 @@ import LoginScreenVendor from '../Screen/vendor/OnboardingScreen/LoginScreenVend
 import SimplifiedOnboarding from '../Screen/vendor/OnboardingScreen/SignUpvendor';
 import LoginScreenCustomer from '../Screen/customer/OnboardingScreenCustomer/LogiScreenCustomer';
 import SignUpCustomer from '../Screen/customer/OnboardingScreenCustomer/SignUpCustomer';
+import BusinessProfileSetup from '../Screen/vendor/OnboardingScreen/BusinessProfileSetup';
 
 const Stack = createStackNavigator();
 
 const AppNavigator = () => {
   const dispatch = useDispatch();
-  const { userType, token } = useSelector(state => state.auth);
+  const { userType } = useSelector(state => state.auth);
 
   const [showSplash, setShowSplash] = useState(true); // <-- Local splash state
 
@@ -74,7 +74,7 @@ const AppNavigator = () => {
         // User type selected but not authenticated
         <AuthNavigator />
       ) : userType === 'customer' ? (
-        // Authenticated customer
+        // Authenticated customer1
         <CustomerNavigator />
       ) : (
         // Authenticated vendor
@@ -89,6 +89,7 @@ const AppNavigator = () => {
       <Stack.Screen name="SignUpVendor" component={SimplifiedOnboarding} />
       <Stack.Screen name="LoginScreenCustomer" component={LoginScreenCustomer} />
       <Stack.Screen name="SignUpCustomer" component={SignUpCustomer} />
+      <Stack.Screen name="BusinessProfileSetup" component={BusinessProfileSetup} />
     </>
   ) : userType === 'customer' ? (
     <Stack.Screen name="CustomerNavigator" component={CustomerNavigator} />
