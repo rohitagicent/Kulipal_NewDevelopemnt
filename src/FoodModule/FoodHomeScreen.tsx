@@ -20,9 +20,10 @@ import {
 import {colors} from '../utils/colors';
 import Icon from '../utils/icons';
 import {fp} from '../utils/dimension';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {RestaurantDetail} from '../services/Interface/GetRestaurantDetailResponse';
-import {GET_RESTAURENT_DETAIL} from '../services/Apifunctions';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { RestaurantDetail } from '../services/Interface/GetRestaurantDetailResponse';
+import { GET_RESTAURENT_DETAIL } from '../services/Apifunctions';
+import FastImage from 'react-native-fast-image';
 
 interface TabItemProps {
   active: boolean;
@@ -128,11 +129,19 @@ const FilterTab = memo(({name, isActive, onToggle}: FilterTabProps) => (
 
 const RestaurantItem = memo(({name, image, onPress}: RestaurantItemProps) => (
   <TouchableOpacity style={styles.restaurantItem} onPress={onPress}>
-    <Image
+    {/* <Image
       source={{uri: image}}
       style={styles.restaurantImage}
       resizeMode="cover"
-    />
+    /> */}
+    <FastImage
+     style={styles.restaurantImage}
+  source={{
+    uri:image,
+    priority: FastImage.priority.high,
+  }}
+  resizeMode={FastImage.resizeMode.cover}
+/>
     <Text style={styles.restaurantName}>{name}</Text>
   </TouchableOpacity>
 ));
@@ -140,11 +149,19 @@ const RestaurantItem = memo(({name, image, onPress}: RestaurantItemProps) => (
 const MoodItem = memo(({label, image}: MoodItemProps) => (
   <TouchableOpacity style={styles.moodItem}>
     <View style={styles.imageContainer}>
-      <Image
+      {/* <Image
         source={{uri: image}}
         style={styles.moodImage}
         resizeMode="cover"
-      />
+      /> */}
+      <FastImage
+     style={styles.moodImage}
+  source={{
+    uri:image,
+    priority: FastImage.priority.high,
+  }}
+  resizeMode={FastImage.resizeMode.cover}
+/>
       <View style={styles.textOverlay}>
         <Text style={styles.moodLabel}>{label}</Text>
       </View>
@@ -165,11 +182,19 @@ const RestaurantCard = memo(
   }: RestaurantCardProps) => (
     <TouchableOpacity style={[styles.redCardWrapper, styles.shadowStyle]}>
       <View style={styles.restaurantCard}>
-        <Image
+        {/* <Image
           source={{uri: image}}
           style={styles.restaurantCardImage}
           resizeMode="cover"
-        />
+        /> */}
+         <FastImage
+     style={styles.restaurantCardImage}
+  source={{
+    uri:image,
+    priority: FastImage.priority.high,
+  }}
+  resizeMode={FastImage.resizeMode.cover}
+/>
         <TouchableOpacity style={styles.favoriteButton}>
           <Icon name="favorite-border" size={fp(2.5)} color="#fff" />
         </TouchableOpacity>
@@ -209,7 +234,7 @@ const RestaurantCard = memo(
   ),
 );
 
-const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
+const HomeScreenFood: React.FC<HomeScreenProps> = ({navigation}) => {
   const [selectedTabs, setSelectedTabs] = useState<string[]>([]);
   const [activeMainTab, setActiveMainTab] = useState<string>('Food');
   const [restaurants, setRestaurants] = useState<RestaurantDetail[]>([]);
@@ -260,7 +285,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
 
   useEffect(() => {
     StatusBar.setTranslucent(true);
-    StatusBar.setBackgroundColor('transparent');
+    StatusBar.setBackgroundColor('rgba(0, 0, 0, 0.2)');
+    StatusBar.setBarStyle('light-content'); // White text in the status bar
+
+   
   }, []);
 
   const moodItems: MoodItem[] = useMemo(
@@ -437,7 +465,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
 
   const HeaderComponent = useMemo(
     () => (
-      <View>
+      <View >
         <ImageBackground
           source={{
             uri: 'https://images.unsplash.com/photo-1511690656952-34342bb7c2f2?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
@@ -449,6 +477,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
               marginTop: Platform.OS === 'ios' ? -50 : 0,
             },
           ]}
+
           resizeMode="cover">
           <FlatList
             data={mainTabs}
@@ -492,15 +521,18 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
               </View>
 
               <TouchableOpacity style={styles.iconCircle}>
-                <Image
-                  source={{
-                    uri: 'https://randomuser.me/api/portraits/men/32.jpg',
-                  }}
-                  style={styles.profilePic}
-                />
+                <FastImage
+     style={styles.profilePic}
+  source={{
+    uri: 'https://randomuser.me/api/portraits/men/32.jpg',
+    priority: FastImage.priority.high,
+  }}
+  resizeMode={FastImage.resizeMode.cover}
+/>
               </TouchableOpacity>
             </View>
           </View>
+         
 
           <View style={styles.searchContainer}>
             <View style={styles.searchBar}>
@@ -526,8 +558,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
               />
             </TouchableOpacity>
           </View>
-        </ImageBackground>
+          </ImageBackground>
       </View>
+      
     ),
     [mainTabs, renderMainTab],
   );
@@ -618,13 +651,22 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
                 Exclusive Offers
               </Text>
               <TouchableOpacity style={styles.offerCard}>
-                <Image
+                {/* <Image
                   source={{
                     uri: 'https://images.unsplash.com/photo-1498654896293-37aacf113fd9',
                   }}
                   style={styles.offerImage}
                   resizeMode="cover"
-                />
+                /> */}
+                  <FastImage
+     style={styles.offerImage}
+  source={{
+    uri: 'https://images.unsplash.com/photo-1498654896293-37aacf113fd9',
+
+    priority: FastImage.priority.high,
+  }}
+  resizeMode={FastImage.resizeMode.cover}
+/>
                 <View style={styles.offerOverlay}>
                   <View style={styles.offerContent}>
                     <Text style={styles.offerTitle}>KOREAN FOOD</Text>
@@ -693,7 +735,7 @@ const styles = StyleSheet.create({
   locationBarBackground: {
     width: '100%',
     height: hp(30),
-    // paddingTop: StatusBar.currentHeight || hp(4),
+    paddingTop: hp(4),
     paddingBottom: hp(2),
     borderBottomLeftRadius: wp(5),
     borderBottomRightRadius: wp(5),
@@ -832,7 +874,7 @@ const styles = StyleSheet.create({
     height: Platform.OS === 'ios' ? hp(4) : hp(5),
     paddingHorizontal: wp(7),
     borderRadius: wp(3),
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    backgroundColor: 'rgba(0, 0, 0, 0.35)', // Black with 60% opacity
     marginHorizontal: wp(1),
     marginTop: hp(5),
   },
@@ -878,7 +920,7 @@ const styles = StyleSheet.create({
   quickFiltersTitle: {
     fontSize: fp(2),
     color: '#888',
-    marginBottom: hp(0.5),
+    marginBottom: hp(1.5),
   },
   section: {
     marginVertical: hp(1.5),
@@ -1214,4 +1256,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeScreen;
+export default HomeScreenFood;
