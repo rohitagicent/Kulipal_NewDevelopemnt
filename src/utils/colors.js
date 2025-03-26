@@ -15,7 +15,8 @@ export const colors = {
    icongray:"#6A6A6A",
    bggray:"lightgray",
    black_test:"#515151",
-   lightgray:"#E0E0E0"
+   lightgray:"#E0E0E0",
+   screenbg:"#F8F9FA"
   };
   
 

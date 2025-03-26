@@ -12,6 +12,8 @@ import { setAuthToken, setUserType } from '../store/authActions';
 import KulipalBusinessScreen from '../Screen/auth/KulipalBusinessScreen';
 import LoginScreenVendor from '../Screen/vendor/OnboardingScreen/LoginScreenVendor';
 import SimplifiedOnboarding from '../Screen/vendor/OnboardingScreen/SignUpvendor';
+import LoginScreenCustomer from '../Screen/customer/OnboardingScreenCustomer/LogiScreenCustomer';
+import SignUpCustomer from '../Screen/customer/OnboardingScreenCustomer/SignUpCustomer';
 
 const Stack = createStackNavigator();
 
@@ -85,6 +87,8 @@ const AppNavigator = () => {
       <Stack.Screen name="KulipalBusinessScreen" component={KulipalBusinessScreen} />
       <Stack.Screen name="LoginScreenVendor" component={LoginScreenVendor} />
       <Stack.Screen name="SignUpVendor" component={SimplifiedOnboarding} />
+      <Stack.Screen name="LoginScreenCustomer" component={LoginScreenCustomer} />
+      <Stack.Screen name="SignUpCustomer" component={SignUpCustomer} />
     </>
   ) : userType === 'customer' ? (
     <Stack.Screen name="CustomerNavigator" component={CustomerNavigator} />

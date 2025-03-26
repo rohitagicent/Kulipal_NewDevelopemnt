@@ -66,16 +66,19 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
     if (selectedOption === "vendor") {
       navigation.navigate("LoginScreenVendor");
     }
-  
     if (selectedOption === "customer") {
-  
-      try {
-        await AsyncStorage.setItem("userType", selectedOption);
-        dispatch(setUserType(selectedOption));
-      } catch (error) {
-        console.log("Error saving user type", error);
-      }
+      navigation.navigate("LoginScreenCustomer");
     }
+  
+    // if (selectedOption === "customer") {
+  
+    //   try {
+    //     await AsyncStorage.setItem("userType", selectedOption);
+    //     dispatch(setUserType(selectedOption));
+    //   } catch (error) {
+    //     console.log("Error saving user type", error);
+    //   }
+    // }
   }, [selectedOption, navigation, dispatch]);
   
 
