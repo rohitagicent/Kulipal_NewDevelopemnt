@@ -14,7 +14,6 @@ import {fp, wp, hp} from '../../../utils/dimension';
 import {colors} from '../../../utils/colors';
 import Icon from '../../../utils/icons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {useNavigation} from '@react-navigation/native';
 import SelectDropdown from 'react-native-select-dropdown';
 import {OtpInput} from 'react-native-otp-entry';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -189,12 +188,6 @@ const setUpBusiness = (): void => {
   // Registration Form Screen
   const RegistrationFormScreen = () => {
     const [passwordVisible, setPasswordVisible] = useState<boolen>(false);
-    // const updateFormData = (key, value) => {
-    //   setFormData(prevData => ({
-    //     ...prevData,
-    //     [key]: value,
-    //   }));
-    // };
     const togglePasswordVisibility = () => {
       setPasswordVisible(!passwordVisible);
     };

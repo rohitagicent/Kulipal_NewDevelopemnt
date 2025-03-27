@@ -82,9 +82,9 @@ const AppNavigator = () => {
   {!userType ? (
     <>
       {/* <Stack.Screen name="UserTypeSelection" component={UserTypeSelectionScreen} /> */}
-      <Stack.Screen name="KulipalBusinessScreen" component={KulipalBusinessScreen} />
-      <Stack.Screen name="LoginScreenVendor" component={LoginScreenVendor} />
-      <Stack.Screen name="SignUpVendor" component={SimplifiedOnboarding} />
+      {/* <Stack.Screen name="KulipalBusinessScreen" component={KulipalBusinessScreen} /> */}
+      {/* <Stack.Screen name="LoginScreenVendor" component={LoginScreenVendor} /> */}
+      {/* <Stack.Screen name="SignUpVendor" component={SimplifiedOnboarding} /> */}
       <Stack.Screen name="BusinessProfileSetup" component={BusinessProfileSetup} />
     </>
   ) : userType === 'customer' ? (
