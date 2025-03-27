@@ -11,7 +11,12 @@ export const colors = {
     gray:"#4A4A4A",
     grattext:"#656465",
     veg_Color:"#0DBA67",
-   nonveg_color:"#DE3557"
+   nonveg_color:"#DE3557",
+   icongray:"#6A6A6A",
+   bggray:"lightgray",
+   black_test:"#515151",
+   lightgray:"#E0E0E0",
+   screenbg:"#F8F9FA"
   };
   
 

@@ -1,8 +1,7 @@
-import React, { useState, useMemo, useCallback, memo} from 'react';
+import React, { useState, useMemo, useCallback, memo } from 'react';
 import {
   View,
   Text,
-  Image,
   ScrollView,
   TextInput,
   TouchableOpacity,
@@ -15,8 +14,9 @@ import {colors} from '../utils/colors';
 import Icon from '../utils/icons';
 import {fp, wp, hp} from '../utils/dimension';
 import {useNavigation} from '@react-navigation/native';
+import FoodItemModal from './FoodItemModal';
+import FastImage from 'react-native-fast-image';
 
-// Type definitions
 interface Service {
   icon: string;
   label: string;
@@ -132,9 +132,33 @@ const FilterTabComponent = memo(({name, isActive, onToggle}: FilterTabProps) => 
 
 const RestaurantDetailScreen: React.FC = () => {
   const navigation = useNavigation();
-
   const [selectedTabs, setSelectedTabs] = useState<string[]>([]);
-  
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedFood, setSelectedFood] = useState(null);
+  const [cartItems, setCartItems] = useState([]);
+  const handleAddToCartClick = (item: React.SetStateAction<null>) => {
+    setSelectedFood(item);
+    setModalVisible(true);
+  };
+
+  // Function to handle adding item to cart
+  const handleAddToCart = (item: { id: any; quantity: any; }) => {
+    const existingItemIndex = cartItems.findIndex(
+      cartItem => cartItem.id === item.id
+    );
+
+    if (existingItemIndex >= 0) {
+      // Item already exists in cart, update quantity
+      const updatedCartItems = [...cartItems];
+      updatedCartItems[existingItemIndex].quantity += item.quantity;
+      setCartItems(updatedCartItems);
+    } else {
+      // Item is new, add to cart
+      setCartItems([...cartItems, item]);
+    }
+    
+    // You could show a toast here to confirm item was added
+  };
   const filterTabs = useMemo<FilterTab[]>(
     () => [
       {id: '1', name: 'Dine-in'},
@@ -195,14 +219,23 @@ const RestaurantDetailScreen: React.FC = () => {
   );
   
   return (
+    <>
     <ScrollView style={{flex: 1, backgroundColor: '#f9f9f9'}}>
       <View style={{height: 240, position: 'relative'}}>
-        <Image
+        {/* <Image
           source={{
             uri: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836',
           }}
           style={{width: '100%', height: 240}}
-        />
+        /> */}
+         <FastImage
+          style={{width: '100%', height: 240}}
+          source={{
+            uri: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836',
+    priority: FastImage.priority.high,
+  }}
+  resizeMode={FastImage.resizeMode.cover}
+/>
         <View
           style={{
             position: 'absolute',
@@ -317,7 +350,7 @@ const RestaurantDetailScreen: React.FC = () => {
             style={{
               flexDirection: 'row',
               justifyContent: 'space-between',
-              marginVertical: hp(1),
+              // gap: hp(0.5),
             }}>
             <TouchableOpacity style={styles.tabButtonActive}>
               <Text style={styles.tabTextActive}>Overview</Text>
@@ -493,7 +526,7 @@ const RestaurantDetailScreen: React.FC = () => {
             </View>
           </View>
 
-          <View style={{paddingHorizontal: 16}}>
+          <View style={{paddingHorizontal: wp(4)}}>
             <Text style={styles.sectionTitle}>Must Try</Text>
             <FlatList
               data={categories}
@@ -503,11 +536,19 @@ const RestaurantDetailScreen: React.FC = () => {
               renderItem={({item}) => (
                 <TouchableOpacity style={styles.moodItem}>
                   <View style={styles.imageContainer}>
-                    <Image
+                    {/* <Image
                       source={{uri: item.img}}
                       style={styles.moodImage}
                       resizeMode="cover"
-                    />
+                    /> */}
+                       <FastImage
+                      style={styles.moodImage}
+                      source={{
+            uri: item.img,
+    priority: FastImage.priority.high,
+  }}
+  resizeMode={FastImage.resizeMode.cover}
+/>
                     <View style={styles.textOverlay}>
                       <Text style={styles.moodLabel}>{item.name}</Text>
                     </View>
@@ -522,13 +563,23 @@ const RestaurantDetailScreen: React.FC = () => {
             {recommended.map(item => (
               <View key={item.id} style={styles.recommendedCard}>
                 <View>
-                  <Image
+                  {/* <Image
                     source={{uri: item.image}}
                     style={styles.recommendedImage}
-                  />
+                  /> */}
+                    <FastImage
+                      style={styles.recommendedImage}
+                      source={{
+            uri: item.image,
+    priority: FastImage.priority.high,
+  }}
+  resizeMode={FastImage.resizeMode.cover}
+/>
                   <View style={{flexDirection: 'column', marginTop: 5}}>
-                    <TouchableOpacity style={styles.addToCart}>
-                      <Text style={styles.addToCartText}>Add to Cart</Text>
+                  <TouchableOpacity 
+                    style={styles.addToCart}
+                    onPress={() => handleAddToCartClick(item)}
+                  >                      <Text style={styles.addToCartText}>Add to Cart</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity style={styles.customizableButton}>
@@ -586,7 +637,7 @@ const RestaurantDetailScreen: React.FC = () => {
                           alignItems: 'center',
                           marginTop: 4,
                         }}>
-                        <Ionicons name="location" size={14} color="#ff3b30" />
+                        <Ionicons name="location-outline" size={14} color="#ED264E" />
                         <Text
                           style={{marginLeft: 4, color: 'gray', fontSize: 13}}>
                           190m
@@ -617,7 +668,7 @@ const RestaurantDetailScreen: React.FC = () => {
                   </View>
                   <Text style={styles.recommendedDesc} numberOfLines={2}>
                     Lorem ipsum dolor sit amet consectetur. Accum...
-                    <Text style={{color: '#3b82f6'}}>more</Text>
+                    <Text style={{color: 'black'}}>more</Text>
                   </Text>
                 </View>
               </View>
@@ -626,6 +677,13 @@ const RestaurantDetailScreen: React.FC = () => {
         </View>
       </View>
     </ScrollView>
+    <FoodItemModal
+        isVisible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        foodItem={selectedFood}
+        onAddToCart={handleAddToCart}
+      />
+    </>
   );
 };
 
@@ -752,10 +810,7 @@ const RestaurantDetailScreen: React.FC = () => {
     color: '#333',
     marginBottom: hp(1),
   },
-  ratingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
+
   ratingText: {
     fontSize: fp(2.5),
     fontWeight: '700',
@@ -768,16 +823,19 @@ const RestaurantDetailScreen: React.FC = () => {
     marginLeft: wp(0.5),
   },
   tabButton: {
-    paddingVertical: hp(1),
-    paddingHorizontal: wp(3),
-    borderRadius: wp(3),
+    paddingVertical: hp(0.8),
+    paddingHorizontal: wp(2.5),
+    borderRadius: wp(5),
     backgroundColor: 'skyblue',
   },
   tabText: {color: 'white'},
   tabButtonActive: {
-    paddingVertical: hp(1),
-    paddingHorizontal: wp(3),
-    borderRadius: wp(3),
+    // paddingVertical: hp(1),
+    // paddingHorizontal: wp(3),
+    // borderRadius: wp(3),
+    paddingVertical: hp(0.8),
+    paddingHorizontal: wp(2.5),
+    borderRadius: wp(5),
     backgroundColor: 'white',
   },
   tabTextActive: {color: colors.BLUE, fontWeight: 'bold'},
@@ -834,29 +892,25 @@ const RestaurantDetailScreen: React.FC = () => {
   },
   recommendedDesc: {
     color: '#999',
-    fontSize: 13,
-    marginBottom: hp(5),
+    fontSize: fp(1.5),
+    marginBottom: hp(4),
   },
   addToCart: {
-    backgroundColor: '#3b82f6',
-    borderRadius: 20,
-    paddingVertical: 8,
-    paddingHorizontal: 15,
+    borderRadius: wp(3),
+    borderWidth:wp(0.3),
+    borderColor:colors.BLUE,
+    paddingVertical: hp(0.75),
     alignItems: 'center',
     marginTop: 5,
   },
   addToCartText: {
-    color: 'white',
+    color: colors.BLUE,
     fontWeight: '500',
   },
   customizableButton: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 20,
     paddingVertical: 8,
     paddingHorizontal: 15,
     alignItems: 'center',
-    marginTop: 8,
   },
   customizableText: {
     color: '#666',
